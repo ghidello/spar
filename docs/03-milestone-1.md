@@ -1,6 +1,6 @@
 # Milestone 1: prove the SPAR development loop
 
-Date: 2026-10-18. Status: planned; no implementation or acceptance completed.
+Date: 2026-10-18. Status: M1.1 in progress; managed console probe verified under the watcher, VS Code debugger, and a manual Visual Studio run. See [evidence and remaining gates](07-managed-probe.md). No integrated A01–A18 acceptance scenario is complete.
 
 Inputs: [product direction](02-product-direction.md), [reference projects and license review](01-reference-projects.md).
 
@@ -33,6 +33,8 @@ Select the supported Windows/x64 baseline and SDK/editor/frontend versions. Star
 Verify a method-body edit under terminal `dotnet watch`, VS Code F5 with the C# debugger, and Visual Studio F5. Observe changed behavior on subsequent calls and retained process/state. Verify an unsupported edit and identify how each lane reports it and permits restart. Determine a supported way to notify the coordinator/frontend after an update; if an event is unavailable, document and test the alternative instead of inventing a private debugger contract.
 
 Deliverables: version matrix, minimal reproducible probe, selected update owner for each lane, restart/debugger strategy, and precise supported limitations. Stop expanding this probe once it answers those questions. Do not develop a custom Hot Reload compiler as an incidental workaround.
+
+Progress: [managed probe](07-managed-probe.md), with xUnit integration tests, an actual VS Code extension-host driver, a manual Visual Studio 2026 stable 18.11.0 pass, and successful fork Windows CI. Stable .NET 10 is the initial implementation baseline. The console editor proof permits the native/AOT spike; upstream required-check enforcement and later consumer/status integration remain open. Issue #2 stays open.
 
 ### M1.2 — Build the smallest Windows/AOT application
 
@@ -133,6 +135,10 @@ A copied application on a developer machine is not a clean-machine/no-.NET certi
 
 Upstream `sotsera/spar` has an active `protect-main` ruleset requiring PRs, with no bypass entries. No CI status checks were required when this note was recorded on 2026-10-18 because workflows had not been implemented.
 
+The first workflow now defines **Windows managed probe** for PRs and development-branch pushes. GitHub reported no workflow/check suite on initial draft PR #14; branch CI in the development fork provides a separate pre-merge validation path. Do not treat a fork run as evidence that upstream required-check enforcement works. Add required checks only after upstream runs and the blocking policy have actually been verified.
+
+[Fork run 39143727813](https://github.com/ghidello/spar/actions/runs/39143727813) passed the build, three real watcher tests (none skipped), and evidence upload on implementation commit `0be3b41`. The upstream enforcement checklist below remains open.
+
 When introducing CI during milestone 1, treat enforcement as part of delivering the workflow:
 
 - [ ] Establish stable, unique check names and verify the workflows run on pull requests from the development fork.
@@ -147,4 +153,4 @@ This follow-up initially belongs with the tooling/build foundation (upstream iss
 
 Milestone 1 is complete when A01-A18 have evidence on the selected baseline, the public sample follows its own guide, and known limits are documented. A remaining required scenario keeps the milestone open. No performance, installer, cross-platform, or general production-readiness claim follows automatically.
 
-The next milestone can address consumer polish, supported-machine coverage, workload budgets, file pickers/desktop services, and packaging. Add those only after the development loop is demonstrated. No implementation task in this document is currently marked complete.
+The next milestone can address consumer polish, supported-machine coverage, workload budgets, file pickers/desktop services, and packaging. Add those only after the development loop is demonstrated. M1.1 is partially implemented; the milestone remains open.

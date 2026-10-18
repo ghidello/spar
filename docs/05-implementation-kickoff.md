@@ -1,6 +1,6 @@
 # Implementation kickoff
 
-Date: 2026-10-18. Status: proposed execution plan; environment inspected, no implementation experiments executed.
+Date: 2026-10-18. Status: execution started; the [managed probe](07-managed-probe.md) records actual outcomes and remaining checks. This document remains the sequence for subsequent deliveries.
 
 Read with [product direction](02-product-direction.md), [milestone 1](03-milestone-1.md), and the [upstream issue breakdown](04-milestone-1-issues.md). This document breaks down the first engineering decisions; it does not replace A01–A18 or claim they pass.
 
@@ -10,7 +10,7 @@ Spar is greenfield. Requiring .NET 10 or .NET 11 is acceptable if it enables a b
 
 Compare .NET 10 and .NET 11 using the same small probes, then select one initial supported runtime/language/editor baseline. Distinguish the SDK that builds Spar, the application's target framework, the development runtime/debugger, and the published delivery mode. An AOT consumer still needs a build toolchain, while a published application has different installation requirements.
 
-Recommendation: use the installed stable .NET 10 SDK as a control, and evaluate the current .NET 11 RC if it offers a concrete improvement. Prefer .NET 11 as the sole baseline if the probes justify it. The choice must include a tested Visual Studio path. Do not assume a newer SDK fixes an editor integration gap.
+The first comparison selected stable .NET 10 for implementation: both releases demonstrated the same debugger capabilities and this slice found no necessary RC advantage. Keep .NET 11 as a reproducible comparison lane and raise the product requirement if later probes justify it. The full support promise must include a tested Visual Studio path; a newer SDK alone does not establish editor integration.
 
 Microsoft released [.NET 11 RC2](https://devblogs.microsoft.com/dotnet/dotnet-11-rc-2/) on 2026-10-13 with a go-live license; the announcement identifies Visual Studio 2026 Insiders and VS Code with C# Dev Kit as supported development paths. RC2 is now installed locally. Test the updated release-channel Visual Studio installation against the selected SDK; decide the supported release/tooling baseline deliberately before publishing a support promise.
 
@@ -20,12 +20,12 @@ These are discovery results, not compatibility evidence:
 
 | Component | Observed | Next action |
 | --- | --- | --- |
-| .NET SDK | 10.0.400, 10.0.402, and 11.0.100-rc.2.26504.105 installed, alongside older SDKs | Select and record exact probe versions; add `global.json` so the choice is intentional |
-| Default `dotnet` selection | Unpinned checkout selects 11.0.100-rc.2.26504.105 | Avoid accidental preview drift |
-| Visual Studio | Community 2026, 18.11.12306.390, release channel | Test selected SDK/debugger compatibility; investigate Insiders only if the RC lane requires it |
+| .NET SDK | 10.0.400, 10.0.402, and 11.0.100-rc.2.26504.105 installed, alongside older SDKs | `global.json` now pins stable 10.0.402; retain the RC comparison lane |
+| Default `dotnet` selection | Initial unpinned checkout selected 11.0.100-rc.2.26504.105; repository selection is now 10.0.402 | Keep SDK selection deliberate when upgrading |
+| Visual Studio | Community 2026, stable; About displays 18.11.0, October 2026 Feature Update; earlier discovery reported build 18.11.12306.390 | Manual console debugger probe passed on the .NET 10 project; repeat with the future native/SPA consumer |
 | Native C++ tools | VS discovery reports the x64/x86 C++ tools component | Verify Windows SDK/linker prerequisites with an actual AOT publish |
 | VS Code | 1.142.0, x64 | Establish a reproducible profile and record C# debugger/Dev Kit versions |
-| VS Code extensions | C# Dev Kit 3.40.210; C# 2.160.4; .NET Install Tool 3.2.0; ESLint 3.0.34; Prettier 12.4.0 | Installation verified through the CLI; debugger/Hot Reload behavior still needs the actual probe |
+| VS Code extensions | C# Dev Kit 3.40.210; C# 2.160.4; .NET Install Tool 3.2.0; ESLint 3.0.34; Prettier 12.4.0 | Actual C# debugger probe passed on .NET 10 and 11; consumer/native integration remains ahead |
 | Node/npm | Node 24.21.0, npm 11.19.0; host nvm reports default v24.21.0 | Use the selected Node 24 line for the frontend experiment and record the project version when scaffolding |
 | WebView2 Runtime | Registry reports 155.0.4283.62 | Prove actual host startup; choose SDK and minimum runtime capabilities separately |
 | Windows | Registry reports build 26220.9739 and display version 25H2 | Record the actual test environment; choose the supported Windows floor separately |
@@ -34,7 +34,9 @@ These are discovery results, not compatibility evidence:
 
 ## First delivery: prove the managed editing loop
 
-Work against [upstream issue #2](https://github.com/sotsera/spar/issues/2). Land the foundation documentation through its PR before starting an independent `feat/2-hot-reload-probe` branch from updated upstream `main`.
+Work against [upstream issue #2](https://github.com/sotsera/spar/issues/2). Foundation documentation was squash-merged in [PR #13](https://github.com/sotsera/spar/pull/13), upstream commit `ee94b70`. The implementation branch `feat/2-hot-reload-probe` initially depended on that documentation branch; its four subsequent commits were then replayed onto the new upstream `main`, excluding the old foundation commits. The refreshed implementation tree matched the pre-rebase tree exactly before this status update. Earlier source hashes, commit IDs, and CI receipts remain historical evidence.
+
+The first experiments used SDK `11.0.100-rc.2.26504.105` / `net11.0`; the same complete VS Code scenario also passed on SDK `10.0.402` / `net10.0`. No necessary .NET 11 advantage was demonstrated in this slice. `global.json` therefore selects stable SDK `10.0.402` with roll-forward disabled and previews excluded; both projects now target `net10.0`. Requiring .NET 11 remains an option when a concrete benefit is proved. The manual Visual Studio console probe now passes on this project baseline; the integrated consumer/native/AOT gates still precede a full product support promise. Central stable test dependencies are xUnit v3 `4.0.2` and AwesomeAssertions `9.6.0`; MTP is selected in `global.json`. No frontend toolchain has been scaffolded yet.
 
 Build one disposable CoreCLR console probe under `experiments/`, with no SPA, WebView, production framework packages, or custom compiler. It needs a greeting method, mutable counter, process/instance identity, and an update-observation hook. Commands should exercise the method repeatedly so the next invocation demonstrates new behavior.
 
@@ -110,6 +112,6 @@ Exercise this editor setup with the public sample/external consumer when availab
 
 Create projects/packages as responsibilities become real. Initially, a small probe, minimal host, and consumer sample are enough; avoid prebuilding a plugin system, transport framework, renderer, installer, multi-window architecture, or cross-platform layers.
 
-Keep a short evidence record with each probe/PR: question, exact versions and commands, expected/observed behavior, source revision/hashes, artifacts, conclusion, and remaining limits. A GUI or debugger pass requires actual interaction; source inspection and mocks cannot substitute. No Hot Reload, native rendering, AOT, or editor acceptance experiment was run while preparing this document.
+Keep a short evidence record with each probe/PR: question, exact versions and commands, expected/observed behavior, source revision/hashes, artifacts, conclusion, and remaining limits. A GUI or debugger pass requires actual interaction; source inspection and mocks cannot substitute. The [managed probe ledger](07-managed-probe.md) now records executed watcher, VS Code, and manual Visual Studio console scenarios. Native rendering, integrated editor acceptance, and AOT execution remain ahead.
 
 The first result we want is modest and decisive: **edit a C# method, observe changed behavior with retained state, explain how every supported lane detects the update or restarts, and select the baseline from that evidence.** The next result is a visibly rendering AOT window. Once both are established, the rest of the framework can grow around mechanisms we have actually demonstrated.
