@@ -1,0 +1,20 @@
+[
+  {
+    "scenario": "roundtrips",
+    "passed": true,
+    "forcedCleanup": false,
+    "processId": 55276,
+    "startedAtUtc": "2026-10-19T12:10:55.098534Z",
+    "mode": "NativeAOT",
+    "render": "not-exercised"
+  },
+  {
+    "scenario": "close-with-work",
+    "passed": true,
+    "forcedCleanup": false,
+    "processId": 59036,
+    "startedAtUtc": "2026-10-19T12:10:57.8478814Z",
+    "mode": "NativeAOT",
+    "render": "not-exercised"
+  }
+]

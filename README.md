@@ -8,7 +8,7 @@ Production targets NativeAOT by default, with CoreCLR compatibility for applicat
 
 ## Current status
 
-The native sample now runs React/Vite with generated, permission-checked C# calls in an owned development session. Actual CSS/component HMR preserves local state; planned app restart retains Vite. Terminal/editor ownership and Windows jobs account for child cleanup. The managed Hot Reload probe works under the watcher, VS Code, and Visual Studio; integrating backend updates into this SPA session comes next. See the [development guide](docs/11-development-session.md) and [milestone status](docs/03-milestone-1.md).
+The native sample runs React/Vite with generated, permission-checked C# calls in an owned development session. The terminal/AI watch lane applies supported backend edits in place and refreshes read data while preserving state. Unsupported/contract updates use coordinated rebuild/restart with Vite retained. Editor task ownership works; integrated C# debugger lanes and the remaining milestone scenarios stay open. See the [backend update guide](docs/12-backend-updates.md) and [milestone status](docs/03-milestone-1.md).
 
 ## Run the first slice
 
@@ -22,7 +22,7 @@ Pop-Location
 ./tools/Spar.Dev/bin/Debug/net10.0-windows/Spar.Dev.exe samples/Spar.NativeSample/spar.dev.json
 ```
 
-Edit `App.tsx` or `styles.css` in the sample frontend. Type `stop` or press Ctrl+C to end the session. VS Code provides **Tasks: Run Task → Spar: development session**. See the [development guide](docs/11-development-session.md) for controls, verification, and current limits.
+Edit `App.tsx`/`styles.css` in the frontend or the greeting in `SampleBackend.cs`. Type `stop` or press Ctrl+C to end the session. VS Code provides **Tasks: Run Task → Spar: development session**. See the [backend update guide](docs/12-backend-updates.md) for controls, failed-build recovery, and current limits.
 
 For the precursor probes and full managed tests:
 
@@ -43,7 +43,7 @@ dotnet publish samples/Spar.NativeSample -c Release -o artifacts/native/publish 
 
 The sample uses CoreCLR for Debug and NativeAOT for Release publishing. See the [native host guide](docs/09-native-host.md) for C++ prerequisites, copied-payload checks, and current limits.
 
-The [contract file](samples/Spar.NativeSample/BackendContract.cs) generates the C# adapter, JSON metadata, and framework-neutral JavaScript/TypeScript bindings during the build. See the [bridge guide](docs/10-typed-bridge.md) for the supported DTO surface and actual WebView checks.
+The [contract file](samples/Spar.NativeSample.Contracts/BackendContract.cs) generates the C# adapter, JSON metadata, and framework-neutral JavaScript/TypeScript bindings during the build. Its separate assembly keeps wire metadata outside implementation Hot Reload. See the [bridge guide](docs/10-typed-bridge.md) for the supported DTO surface and actual WebView checks.
 
 The tests edit disposable copies under `artifacts/` and launch real `dotnet watch` processes. The [editor probe guide](docs/07-managed-probe.md) covers VS Code automation, F5 setup, and the recorded Visual Studio manual pass. These are development experiments, not shipping Spar packages.
 

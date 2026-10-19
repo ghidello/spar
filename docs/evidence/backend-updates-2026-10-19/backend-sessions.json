@@ -1,0 +1,26 @@
+[
+  {
+    "scenario": "patch-error-restart",
+    "passed": true,
+    "coordinatorProcessId": 41776,
+    "startedAtUtc": "2026-10-19T12:08:12.1565087Z",
+    "actualExitCode": 0,
+    "abruptOwnerKill": false,
+    "forcedCleanupRequested": false,
+    "independentlyRetainedProcesses": 45,
+    "unrelatedSurvived": true,
+    "rendering": "verified-pixels-review-captures"
+  },
+  {
+    "scenario": "explicit-force-during-retirement",
+    "passed": true,
+    "coordinatorProcessId": 61684,
+    "startedAtUtc": "2026-10-19T12:09:26.594547Z",
+    "actualExitCode": 0,
+    "abruptOwnerKill": false,
+    "forcedCleanupRequested": true,
+    "independentlyRetainedProcesses": 18,
+    "unrelatedSurvived": true,
+    "rendering": "not-exercised"
+  }
+]

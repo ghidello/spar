@@ -1,0 +1,18 @@
+[
+  {
+    "passed": true,
+    "coordinatorAndObservedChildrenExited": true,
+    "editorExitCode": 0,
+    "scenario": "task-stop",
+    "independentlyRetainedProcesses": 18,
+    "debuggerHotReload": "not-exercised"
+  },
+  {
+    "passed": true,
+    "coordinatorAndObservedChildrenExited": true,
+    "editorExitCode": 0,
+    "scenario": "window-close",
+    "independentlyRetainedProcesses": 18,
+    "debuggerHotReload": "not-exercised"
+  }
+]
