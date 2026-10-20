@@ -10,6 +10,8 @@ The existing PR requirement, signed commits, linear history, conversation resolu
 
 The workflow runs on pull requests before merging and on `main` pushes afterward. The post-merge run is an additional check; it is not the merge gate. Detailed logs are under upstream **Actions → Managed probe → Windows managed probe**. Fork branch runs remain separate from upstream PR runs.
 
+The [change-proportional CI policy](21-continuous-integration.md) keeps that required job always present and selects checks within it. Unknown/shared inputs select full coverage; the final audit rejects any selected check that failed, was cancelled, or did not run. Main validates the actual integrated commit using the same selection. Manual dispatch and version tags request full qualification. The ruleset and required check identity are unchanged.
+
 ## Observed evidence
 
 - [Upstream main run 39146637086](https://github.com/sotsera/spar/actions/runs/39146637086) passed before configuring the gate. Its actual check identity was `Windows managed probe`, GitHub Actions integration `15368`.
