@@ -285,3 +285,5 @@ public sealed class BridgeTests
         }
     }
 }
+// CI baseline-selection measurement.
+
