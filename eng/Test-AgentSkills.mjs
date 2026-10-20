@@ -98,3 +98,5 @@ if (process.argv[2]) {
 
 console.log(`Validated ${declared.length} skills, provenance, license, local links, runner overlay, and ${cases.length} case definitions.`);
 console.log('This structural check does not execute prompts or prove automatic skill activation.');
+// CI skill-selection measurement.
+
