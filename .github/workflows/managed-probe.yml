@@ -4,6 +4,8 @@ on:
   pull_request:
   push:
     branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,35 +24,62 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          global-json-file: global.json
+          fetch-depth: 0
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24.21.0'
 
-      - name: Build
-        run: dotnet build Spar.slnx --disable-build-servers
+      - name: Select checks from changed inputs
+        id: selection
+        # Missing outputs enable every group. The final gate audits that fallback.
+        continue-on-error: true
+        run: node eng/ci/Select-Checks.mjs
+
+      - name: Test CI selection and gate
+        id: selection_tests
+        run: node --test eng/ci/selection.test.mjs
+
+      - name: Validate documentation references
+        id: documentation
+        run: node eng/ci/Test-Documentation.mjs
 
       - name: Validate repository agent skills
+        id: skills
         run: node eng/Test-AgentSkills.mjs
 
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        if: steps.selection.outputs.baseline != 'false'
+        with:
+          global-json-file: global.json
+
+      - name: Build
+        id: build
+        if: steps.selection.outputs.baseline != 'false'
+        run: dotnet build Spar.slnx --disable-build-servers
+
       - name: Test bridge contracts and real dotnet watch behavior
+        id: managed
+        if: steps.selection.outputs.baseline != 'false'
         run: dotnet test --solution Spar.slnx --no-build
 
       - name: Test probe log framing during partial writes
+        id: framing
+        if: steps.selection.outputs.baseline != 'false'
         shell: pwsh
         run: ./eng/Test-ProbeEvents.ps1
 
       - name: Check generated TypeScript client
+        id: client
+        if: steps.selection.outputs.frontend != 'false'
         working-directory: eng/bridge-client-tests
         run: |
           npm ci --ignore-scripts
           npm test
 
       - name: Install and check the sample SPA
+        id: spa
+        if: steps.selection.outputs.frontend != 'false'
         working-directory: samples/Spar.NativeSample/frontend
         run: |
           npm ci --ignore-scripts --include=optional
@@ -58,25 +87,37 @@ jobs:
           npm run build
 
       - name: Verify complete frontend distribution notices
+        id: notices
+        if: steps.selection.outputs.frontend != 'false'
         run: node eng/Test-FrontendNotices.mjs
 
       - name: Test owned SPA session and HMR
+        id: session
+        if: steps.selection.outputs.development != 'false'
         shell: pwsh
         run: ./eng/Test-DevelopmentSession.ps1 -EvidenceDirectory artifacts/development/ci
 
       - name: Test native backend Hot Reload and retirement
+        id: backend
+        if: steps.selection.outputs.development != 'false'
         shell: pwsh
         run: ./eng/Test-BackendUpdates.ps1 -EvidenceDirectory artifacts/backend-loop/ci
 
       - name: Test IDE project launch ownership (not debugger acceptance)
+        id: project_launch
+        if: steps.selection.outputs.development != 'false'
         shell: pwsh
         run: ./eng/Test-ProjectLaunch.ps1
 
       - name: Test actual WebView inspection and bounded actions
+        id: inspection
+        if: steps.selection.outputs.development != 'false'
         shell: pwsh
         run: ./eng/Test-DevelopmentInspection.ps1 -EvidenceDirectory artifacts/inspection/ci
 
       - name: Test native CoreCLR bridge
+        id: bridge
+        if: steps.selection.outputs.native != 'false'
         shell: pwsh
         run: >-
           ./eng/Test-Bridge.ps1
@@ -84,6 +125,8 @@ jobs:
           -EvidenceDirectory artifacts/bridge/ci-coreclr
 
       - name: Test native CoreCLR lifecycle
+        id: lifecycle
+        if: steps.selection.outputs.native != 'false'
         shell: pwsh
         run: >-
           ./eng/Test-NativeHost.ps1
@@ -91,32 +134,48 @@ jobs:
           -EvidenceDirectory artifacts/native/ci-coreclr
 
       - name: Publish production SPA as strict NativeAOT
+        id: publish
+        if: steps.selection.outputs.production != 'false'
         run: dotnet publish samples/Spar.NativeSample -c Release -o artifacts/production/publish --disable-build-servers
 
       - name: Verify production build boundary
+        id: boundary
+        if: steps.selection.outputs.production != 'false'
         shell: pwsh
         run: ./eng/Test-ProductionBoundary.ps1
 
       - name: Test copied production SPA (desktop rendering checked separately)
+        id: production
+        if: steps.selection.outputs.production != 'false'
         shell: pwsh
         run: ./eng/Test-Production.ps1 -EvidenceDirectory artifacts/production/ci
 
       - name: Test explicit dependency compatibility and strict AOT failures
+        id: compatibility
+        if: steps.selection.outputs.compatibility != 'false'
         shell: pwsh
         run: ./eng/Test-Compatibility.ps1 -EvidenceDirectory artifacts/compatibility/ci
 
       - name: Pack local consumer dependencies
+        id: pack
+        if: steps.selection.outputs.packages != 'false'
         shell: pwsh
         run: ./eng/Pack-Local.ps1
 
       - name: Test external package consumer (desktop and IDE checks run separately)
+        id: consumer
+        if: steps.selection.outputs.packages != 'false'
         shell: pwsh
         run: ./eng/Test-ExternalConsumer.ps1 -EvidenceDirectory artifacts/external-consumer/ci
 
       - name: Publish separate strict NativeAOT native test fixture
+        id: publish_probe
+        if: steps.selection.outputs.aot != 'false'
         run: dotnet publish samples/Spar.NativeSample -c Release -p:SparNativeProbe=true -o artifacts/native/publish --disable-build-servers
 
       - name: Test copied NativeAOT lifecycle
+        id: copied_probe
+        if: steps.selection.outputs.aot != 'false'
         shell: pwsh
         run: |
           $copyPath = Join-Path $env:RUNNER_TEMP ('spar-native-' + [guid]::NewGuid().ToString('N'))
@@ -131,12 +190,42 @@ jobs:
           ./eng/Test-Bridge.ps1 -Executable (Join-Path $copyPath 'Spar.NativeSample.exe') `
             -ExpectedMode NativeAOT -EvidenceDirectory artifacts/bridge/ci-aot
 
-      - name: Preserve probe evidence
+      - name: Audit all selected check results
+        if: always()
+        env:
+          CI_STEP_RESULTS: ${{ toJSON(steps) }}
+        run: node eng/ci/Complete-Checks.mjs
+
+      - name: Preserve concise results
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: managed-probe-evidence
+          name: managed-probe-results
+          retention-days: ${{ job.status == 'success' && 14 || 30 }}
           path: |
+            artifacts/ci/*.json
+            artifacts/native/ci-*/receipt.json
+            artifacts/bridge/ci-*/receipt.json
+            artifacts/development/ci/receipt.json
+            artifacts/backend-loop/ci/receipt.json
+            artifacts/project-launch/**/receipt.json
+            artifacts/inspection/ci/receipt.json
+            artifacts/production/ci/**/receipt.json
+            artifacts/production/publish/spar-publish.json
+            artifacts/compatibility/ci/*.json
+            artifacts/compatibility/ci/*-run/**/receipt.json
+            artifacts/packages/packages.json
+            artifacts/external-consumer/ci/**/receipt.json
+          if-no-files-found: error
+
+      - name: Preserve failure diagnostics
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: managed-probe-diagnostics
+          retention-days: 30
+          path: |
+            artifacts/ci/*.json
             artifacts/hot-reload/**/watch.log
             artifacts/hot-reload/**/sources.sha256
             **/TestResults/**

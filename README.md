@@ -66,3 +66,4 @@ The tests edit disposable copies under `artifacts/` and launch real `dotnet watc
 - [Reference projects and licenses](docs/01-reference-projects.md) — Tauri, CodeAlta, NeoAstra, Reactor, and previous Spar.
 - [Agent guidance](AGENTS.md) — working rules for this repository.
 - [Repository skills](docs/20-agent-skills.md) — focused testing/MSBuild workflows, pinned provenance, and validation limits.
+- [Continuous integration](docs/21-continuous-integration.md) — change selection, retained coverage, full qualification and artifacts.
