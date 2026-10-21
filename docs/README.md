@@ -19,22 +19,25 @@ not a reading order. Historical records remain at their existing paths.
 | Work on test helpers or agent skills | [Integration helpers](22-integration-test-helpers.md), [repository skills](20-agent-skills.md) |
 | Understand product constraints or upstream provenance | [Product direction](02-product-direction.md), [reference/license review](01-reference-projects.md) |
 
+Active proposal: [consumer setup and coordinator review](25-consumer-coordinator-review.md).
+Its before/after APIs and resource ownership changes await maintainer decisions; they are not current commands.
+
 The minimal app is under `samples/`. Detailed acceptance drivers use the instrumented app under
 `fixtures/`; see the [migration map](23-minimal-application.md#scenario-migration-map). A fixture command
 is not the recommended starting application. Each topic owns its commands; this index and README link to them.
 
 ## Status and deferred work
 
-Status reconciled after [PR #37](https://github.com/sotsera/spar/pull/37), merged as `9025ee2` on 2026-10-21.
+Status reconciled after [PR #38](https://github.com/sotsera/spar/pull/38), merged as `7a0f482` on 2026-10-21.
 This section owns the current repository status; individual evidence records remain bound to their tested sources.
 
 - Milestone 1 tracker #1 and implementation issues #2–#12 are closed. The [acceptance matrix](19-milestone-1-acceptance.md)
   records A01–A18 on the selected Windows developer baseline, including both IDEs with the instrumented consumer.
-- Simplification [#30](https://github.com/sotsera/spar/issues/30), [#31](https://github.com/sotsera/spar/issues/31)
-  and [#32](https://github.com/sotsera/spar/issues/32) are merged and closed: proportional CI, explicit test helpers,
-  and the ordinary application/fixture separation. [#33](https://github.com/sotsera/spar/issues/33) is the current
-  documentation cleanup. [#34](https://github.com/sotsera/spar/issues/34) is a subsequent consumer/coordinator
-  design review; it does not authorize a broad implementation rewrite.
+- Simplification [#30](https://github.com/sotsera/spar/issues/30), [#31](https://github.com/sotsera/spar/issues/31),
+  [#32](https://github.com/sotsera/spar/issues/32) and [#33](https://github.com/sotsera/spar/issues/33) are merged
+  and closed: proportional CI, explicit test helpers, ordinary application/fixture separation and current guidance.
+  [#34](https://github.com/sotsera/spar/issues/34) now has a [consumer/coordinator proposal](25-consumer-coordinator-review.md)
+  awaiting maintainer review. Implementation remains separately scoped; no broad runtime rewrite is authorized.
 - The [minimal-app record](evidence/minimal-application-2026-10-21/README.md) covers actual source/package
   development, copied AOT and VS Code checks. Visual Studio was **not rerun for the new minimal app**.
   Earlier fixture IDE acceptance does not establish that new pass.
