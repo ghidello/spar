@@ -4,6 +4,10 @@ Local packages `0.1.0` expose the runtime, contract generation, build integratio
 
 The default scaffold now uses the ordinary [minimal application](23-minimal-application.md), with greeting/counter operations and no probe reporting. Historical editor acceptance above exercised the instrumented milestone application, now available explicitly with `-IntegrationFixture`.
 
+Its Debug entry point uses the optional [development startup helper](23-minimal-application.md#application-code).
+The factory still supplies the backend and explicit permissions. Existing consumers can retain their
+`Connect`/`SparApplication.Run` startup; no project or package-reference migration is required.
+
 ## Prerequisites and a fresh application
 
 Use the [selected prerequisites](23-minimal-application.md#prerequisites), including native build tools for publication. The generated `global.json` retains the selected SDK. Internet access is needed for ordinary SDK/runtime NuGet dependencies and the frontend lock file; Spar itself restores from the copied local feed.
@@ -106,4 +110,4 @@ The package baseline contains newly authored Spar code. WebView2 loader provenan
 
 The generated consumer includes the same frontend notice build as the sample: complete locked React/React DOM/scheduler licenses and the emitted Vite helper's core license. The private build package requires `dist/frontend-LICENSES.txt`, embeds it with the assets, and copies it alongside AOT and CoreCLR publications. The [production guide](16-production-delivery.md) describes verification and obligations when replacing or extending the frontend. Broader package/release review and public-release readiness remain separate work.
 
-The [separation execution record](evidence/minimal-application-2026-10-21/README.md) verifies both current package variants and both VS Code lanes. The scaffold clears inherited NuGet fallback folders as well as setting its private package cache. No new Visual Studio walkthrough or clean-machine pass is claimed.
+The [separation execution record](evidence/minimal-application-2026-10-21/README.md) verifies both package variants and both VS Code lanes at that revision. The later [startup-helper record](evidence/development-startup-2026-10-21/README.md) adds source/package VS Code 1.143.0 and actual minimal-app Visual Studio walkthroughs; each Visual Studio lane verified 40 retained process exits and three exclusive profile-lease opens. The scaffold clears inherited NuGet fallback folders as well as setting its private package cache. Clean-machine qualification remains unavailable.

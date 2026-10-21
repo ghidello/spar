@@ -8,6 +8,12 @@ The [external package-consumer walkthrough](evidence/milestone-acceptance-2026-1
 
 ## Setup
 
+The later [startup-helper execution record](evidence/development-startup-2026-10-21/README.md) exercises
+the ordinary minimal application in both a disposable source solution and a fresh two-project package
+consumer on Visual Studio Community 2026 18.11.0 Stable. Actual IDE gestures, native state retention,
+compiler/unsupported-edit diagnostics, contract rebuild/relaunch and debugger Stop passed. Each lane
+verified 40 retained process exits across three sessions and three exclusive profile-lease opens.
+
 Use the [selected prerequisites](23-minimal-application.md#prerequisites). The native pass used Visual Studio Community 2026 stable (installed `devenv.exe` version `18.11.12306.390`, MSBuild `18.11.0-1.26475.11`). Prepare from the repository root:
 
 ```powershell
@@ -46,6 +52,10 @@ Create disposable source copies, an absolute-path launch profile, and a solution
 ```powershell
 pwsh -NoProfile -File eng/Test-ProjectLaunch.ps1 -PrepareOnly
 ```
+
+Add `-MinimalApplication` to prepare or test the ordinary application and its `DevelopmentApplication.Run`
+helper. This selects `samples/` sources; the default continues to exercise the explicit integration fixture.
+Lifecycle automation remains separate from the actual Visual Studio walkthrough for either variant.
 
 Open the printed fixture's `Fixture.slnx` and set `Spar.NativeSample` as the startup project. The contract project must be loaded alongside the app so IDE builds compile its edited source. The first fixture omitted it, and Visual Studio rebuilt the app against an old contract DLL without the expected compiler error; that failure is retained in the evidence. Shared framework/tool projects are included for build ordering; all deliberate edits below belong inside the fixture's backend/contracts/frontend copies. Its frontend uses a `node_modules` junction; never recursively delete the fixture as routine cleanup.
 

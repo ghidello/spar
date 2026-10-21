@@ -20,7 +20,9 @@ not a reading order. Historical records remain at their existing paths.
 | Understand product constraints or upstream provenance | [Product direction](02-product-direction.md), [reference/license review](01-reference-projects.md) |
 
 Accepted review: [consumer setup and coordinator review](25-consumer-coordinator-review.md).
-C1 trims redundant scaffold settings. Its proposed startup API (C2) and watcher owner (K1) remain future work.
+C1 trims redundant scaffold settings. C2 supplies the optional development startup helper;
+its [acceptance record](evidence/development-startup-2026-10-21/README.md) includes passing source/package
+VS Code and actual Visual Studio walkthroughs. The proposed watcher owner (K1) remains future work.
 
 The minimal app is under `samples/`. Detailed acceptance drivers use the instrumented app under
 `fixtures/`; see the [migration map](23-minimal-application.md#scenario-migration-map). A fixture command
@@ -28,7 +30,7 @@ is not the recommended starting application. Each topic owns its commands; this 
 
 ## Status and deferred work
 
-Status reconciled after [PR #39](https://github.com/sotsera/spar/pull/39), merged as `197b48c` on 2026-10-21.
+Status reconciled after [PR #40](https://github.com/sotsera/spar/pull/40), merged as `d68715b` on 2026-10-21.
 This section owns the current repository status; individual evidence records remain bound to their tested sources.
 
 - Milestone 1 tracker #1 and implementation issues #2–#12 are closed. The [acceptance matrix](19-milestone-1-acceptance.md)
@@ -38,9 +40,12 @@ This section owns the current repository status; individual evidence records rem
   and closed: proportional CI, explicit test helpers, ordinary application/fixture separation and current guidance.
   [#34](https://github.com/sotsera/spar/issues/34) is also closed after acceptance of the
   [consumer/coordinator review](25-consumer-coordinator-review.md). Implementation is separately scoped:
-  C1 trims scaffold defaults first; C2 and K1 remain future PRs.
+  C1's scaffold defaults are merged in PR #40; C2's optional startup helper and its completed local acceptance
+  are in PR #41 awaiting review/merge. K1 remains a future PR.
 - The [minimal-app record](evidence/minimal-application-2026-10-21/README.md) covers actual source/package
-  development, copied AOT and VS Code checks. Visual Studio was **not rerun for the new minimal app**.
+  development, copied AOT and VS Code checks. The later
+  [startup-helper record](evidence/development-startup-2026-10-21/README.md) adds actual source/package
+  minimal-app Visual Studio walkthroughs.
   Earlier fixture IDE acceptance does not establish that new pass.
 - Clean Windows/no-.NET-machine execution is unverified. Local packages are not a public NuGet release.
   Supported-machine/editor/WebView2 coverage, distribution/license review, installers/signing/updates and
