@@ -159,6 +159,16 @@
       "description": "Real watcher, Windows process ownership, helper teardown and CLI startup failures.",
       "steps": [
         {
+          "id": "native-window-selection",
+          "command": "pwsh",
+          "arguments": ["-NoProfile", "-File", "eng/Test-NativeWindowSelection.ps1"]
+        },
+        {
+          "id": "contract-incrementality",
+          "command": "pwsh",
+          "arguments": ["-NoProfile", "-File", "eng/Test-ContractIncrementality.ps1", "-EvidenceDirectory", "{evidence}/contract-incrementality"]
+        },
+        {
           "id": "build-development-tests",
           "command": "dotnet",
           "arguments": [
@@ -546,6 +556,11 @@
             "-Output",
             "{evidence}/feed"
           ]
+        },
+        {
+          "id": "contract-incrementality",
+          "command": "pwsh",
+          "arguments": ["-NoProfile", "-File", "eng/Test-ContractIncrementality.ps1", "-Feed", "{evidence}/feed", "-EvidenceDirectory", "{evidence}/contract-incrementality"]
         },
         {
           "id": "instrumented-consumer",
