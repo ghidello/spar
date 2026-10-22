@@ -18,6 +18,10 @@ The map includes every check in the previous workflow. Groups are additive, and 
 | Packages | `Pack-Local.ps1`; `Test-ExternalConsumer.ps1`; `Test-MinimalConsumer.ps1` | Default ordinary consumer and explicit instrumented fixture; fresh external restore/build, public package references, packaged coordinator and contracts, development updates/restart, copied AOT/CoreCLR execution and boundary checks |
 | AOT probe | Separate `SparNativeProbe=true` publish; copied payload inventory; `Test-NativeHost.ps1` and `Test-Bridge.ps1` | Strict native test payload, copied AOT lifecycle and bridge scenarios. Runs after the normal production boundary check. |
 
+The existing helper/framing baseline step also runs `Test-DevelopmentStartup.ps1`: actual CLI preflight
+failures must return bounded useful output and exit `1`, preserve event destinations and leave owned jobs
+empty. Actual editor failure presentation remains a separate desktop check.
+
 ## Selection policy
 
 - Recognized documentation and repository skill changes use lightweight checks. Historical evidence under `docs/evidence/` is retained documentation, not an executable test input.
@@ -41,6 +45,14 @@ Before distributing a release, the maintainer must verify a successful full run 
 CI native tests do not establish reviewed pixels or debugger acceptance. `Test-VSCodeProbe.ps1`, `Test-VSCodeSession.ps1`, `Test-VSCodeDevelopment.ps1`, their external-consumer lane, `-VerifyRender` image review, and the manual Visual Studio walkthrough remain available through their existing guides. They were not in the old hosted workflow and are not silently promoted to hosted acceptance. Clean-machine verification remains deferred.
 
 ## Results and artifacts
+
+The hosted job disables npm's automatic install-time advisory request with `NPM_CONFIG_AUDIT=false`.
+Locked dependency installation, compilation and their failure results remain required. This avoids
+making those checks wait on an advisory service; it does not claim a vulnerability scan. npm timing
+JSON is retained with concise results, and npm debug/timing logs with failure diagnostics. An absolute
+log directory also captures installs inside external consumers. The
+[2026-10-22 review](27-ci-reliability-review.md) records the timeout, repair evidence and proposed job
+isolation; those broader structural changes are not implemented by this repair.
 
 The job summary and `managed-probe-results` record source/event/range, changed paths, classification reasons, selected groups, and each check's success/failure/skipped outcome. Success artifacts retain compact native/integration/package/publication receipts for 14 days. Failed or cancelled runs retain these results and the previous detailed evidence paths as `managed-probe-diagnostics` for 30 days (logs, source hashes, test results, inspection snapshots/images and isolated failure evidence). Selection and gate reports never include environment dumps or launch credentials. Runner logs remain available under GitHub's repository retention policy.
 
